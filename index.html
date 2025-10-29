@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sausage Rollers Chipping Club Selector</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #e8f5e9;
+    color: #1b5e20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    width: 90%;
+    max-width: 380px;
+  }
+  h1 {
+    text-align: center;
+    color: #1b5e20;
+    margin-bottom: 8px;
+  }
+  p.desc {
+    font-size: 0.9em;
+    text-align: center;
+    color: #333;
+    margin-bottom: 16px;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+  }
+  input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+  }
+  .result {
+    margin-top: 20px;
+    text-align: center;
+    background: #f1f8e9;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .club {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #2e7d32;
+  }
+  footer {
+    text-align: center;
+    font-size: 0.75em;
+    color: #777;
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Sausage Rollers Chipping Club Selector</h1>
+  <p class="desc">Automatically suggests optimal club for chipping based on <strong>Rule of 12 yardages, green speed and green slope</strong>.</p>
+
+  <!-- Carry -->
+  <label for="carry">Carry Distance (yards)</label>
+  <input type="number" id="carry" placeholder="e.g. 5">
+
+  <!-- Rollout -->
+  <label for="rollout">Rollout Distance (yards)</label>
+  <input type="number" id="rollout" placeholder="e.g. 5">
+
+  <!-- Green Speed (Dropdown) -->
+  <label for="speed">Green Speed (Stimp range)</label>
+  <select id="speed">
+    <option value="Slow (Stimp <8)">Slow (Stimp <8)</option>
+    <option value="Medium (Stimp 8–10)" selected>Medium (Stimp 8–10)</option>
+    <option value="Fast (Stimp >10)">Fast (Stimp >10)</option>
+  </select>
+
+  <!-- Green Slope (Dropdown) -->
+  <label for="slope">Green Slope (%)</label>
+  <select id="slope">
+    <option value=">3% Uphill">&gt;3% Uphill</option>
+    <option value="1-3% Uphill">1–3% Uphill</option>
+    <option value="Flat" selected>Flat</option>
+    <option value="1-3% Downhill">1–3% Downhill</option>
+    <option value=">3% Downhill">&gt;3% Downhill</option>
+  </select>
+
+  <!-- Output -->
+  <div class="result">
+    <p>Recommended Club:</p>
+    <p class="club" id="clubName">—</p>
+  </div>
+
+  <footer>© 2025 Sausage Rollers Chipping Club Selector</footer>
+</div>
+
+<script>
+  const clubMap = {
+    12: "Sand Wedge (SW)",
+    11: "Gap Wedge (GW)",
+    10: "Pitching Wedge (PW)",
+    9: "9 Iron",
+    8: "8 Iron",
+    7: "7 Iron",
+    6: "6 Iron",
+    5: "5 Iron"
+  };
+
+  const slopeAdjustment = {
+    ">3% Uphill": 1.5,
+    "1-3% Uphill": 0.5,
+    "Flat": 0,
+    "1-3% Downhill": -0.5,
+    ">3% Downhill": -1.5
+  };
+
+  const speedAdjustment = {
+    "Slow (Stimp <8)": 0.5,
+    "Medium (Stimp 8–10)": 0,
+    "Fast (Stimp >10)": -0.5
+  };
+
+  function calculateClub() {
+    const carry = parseFloat(document.getElementById("carry").value);
+    const rollout = parseFloat(document.getElementById("rollout").value);
+    const speed = document.getElementById("speed").value;
+    const slope = document.getElementById("slope").value;
+    const output = document.getElementById("clubName");
+
+    if (!carry || !rollout || carry <= 0) {
+      output.textContent = "Enter valid numbers";
+      return;
+    }
+
+    let baseClubNumber = 12 - rollout / carry;
+    baseClubNumber -= slopeAdjustment[slope];
+    baseClubNumber -= speedAdjustment[speed];
+
+    let clubNumber = Math.round(baseClubNumber);
+    clubNumber = Math.max(5, Math.min(12, clubNumber));
+
+    output.textContent = clubMap[clubNumber] || "Club not found";
+  }
+
+  // Auto-calculate on any input change
+  document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("input", calculateClub);
+    el.addEventListener("change", calculateClub);
+  });
+</script>
+
+</body>
+</html>
