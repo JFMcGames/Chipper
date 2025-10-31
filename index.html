@@ -71,7 +71,7 @@
 
 <div class="container">
   <h1>Sausage Rollers Chipping Caddie</h1>
-  <p class="desc">Automatically suggests optimal club for chip shots near the green for toe-down putting style strokes. User must decide and enter carry and rollout yardages based on ball position, hole position and target landing spot, plus estimates for green speed and green slope.</p>
+  <p class="desc">Automatically suggests optimal club for chip shots near the green for chips with a toe-down putting stroke and ball in middle of stance. User must enter carry and rollout yardages based on ball position, hole position and target landing spot, plus estimates for green speed and green slope.</p>
 
   <!-- Carry -->
   <label for="carry">Carry Distance (yards)</label>
@@ -80,14 +80,6 @@
   <!-- Rollout -->
   <label for="rollout">Rollout Distance (yards)</label>
   <input type="number" id="rollout" placeholder="e.g. 5">
-
-  <!-- Chip Flight (Dropdown) -->
-  <label for="chipFlight">Chip Flight</label>
-  <select id="chipFlight">
-    <option value="Medium" selected>Medium (ball middle of stance)</option>
-    <option value="High">High (ball inside lead heel)</option>
-    <option value="Low">Low (ball inside trail heel)</option>
-  </select>
 
   <!-- Green Speed (Dropdown) -->
   <label for="speed">Green Speed (Stimp range)</label>
@@ -142,22 +134,11 @@
     "Fast (Stimp >10)": -0.5
   };
 
-  // Adjustments for chip flight:
-  // High: more carry (ball forward/lead heel) — suggest slightly less club (towards higher loft)
-  // Medium: neutral
-  // Low: less carry — suggest slightly more club (towards lower loft)
-  const chipFlightAdjustment = {
-    "High": -0.5,
-    "Medium": 0,
-    "Low": 0.5
-  };
-
   function calculateClub() {
     const carry = parseFloat(document.getElementById("carry").value);
     const rollout = parseFloat(document.getElementById("rollout").value);
     const speed = document.getElementById("speed").value;
     const slope = document.getElementById("slope").value;
-    const chipFlight = document.getElementById("chipFlight").value;
     const output = document.getElementById("clubName");
 
     if (!carry || !rollout || carry <= 0) {
@@ -170,7 +151,6 @@
     // apply slope, speed and chip flight adjustments (same sign convention as existing adjustments)
     baseClubNumber -= slopeAdjustment[slope] || 0;
     baseClubNumber -= speedAdjustment[speed] || 0;
-    baseClubNumber -= chipFlightAdjustment[chipFlight] || 0;
 
     let clubNumber = Math.round(baseClubNumber);
     clubNumber = Math.max(5, Math.min(12, clubNumber));
